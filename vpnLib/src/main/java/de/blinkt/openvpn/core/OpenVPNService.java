@@ -319,7 +319,8 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         if (mProfile != null)
             nbuilder.setContentTitle(getString(R.string.notifcation_title, mProfile.mName));
         else
-            nbuilder.setContentTitle(getString(R.string.notifcation_title_notconnect));
+            return;
+            //nbuilder.setContentTitle(getString(R.string.notifcation_title_notconnect));
 
         nbuilder.setContentText(msg);
         nbuilder.setOnlyAlertOnce(true);
@@ -436,19 +437,20 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         nbuilder.addAction(R.drawable.ic_menu_close_clear_cancel,
                 getString(R.string.cancel_connection), disconnectPendingIntent);
 
-        Intent pauseVPN = new Intent(this, OpenVPNService.class);
-        if (mDeviceStateReceiver == null || !mDeviceStateReceiver.isUserPaused()) {
-            pauseVPN.setAction(PAUSE_VPN);
-            PendingIntent pauseVPNPending = PendingIntent.getService(this, 0, pauseVPN, 0);
-            nbuilder.addAction(R.drawable.ic_menu_pause,
-                    getString(R.string.pauseVPN), pauseVPNPending);
-
-        } else {
-            pauseVPN.setAction(RESUME_VPN);
-            PendingIntent resumeVPNPending = PendingIntent.getService(this, 0, pauseVPN, 0);
-            nbuilder.addAction(R.drawable.ic_menu_play,
-                    getString(R.string.resumevpn), resumeVPNPending);
-        }
+        // Removed pauseVPN
+//        Intent pauseVPN = new Intent(this, OpenVPNService.class);
+//        if (mDeviceStateReceiver == null || !mDeviceStateReceiver.isUserPaused()) {
+//            pauseVPN.setAction(PAUSE_VPN);
+//            PendingIntent pauseVPNPending = PendingIntent.getService(this, 0, pauseVPN, 0);
+//            nbuilder.addAction(R.drawable.ic_menu_pause,
+//                    getString(R.string.pauseVPN), pauseVPNPending);
+//
+//        } else {
+//            pauseVPN.setAction(RESUME_VPN);
+//            PendingIntent resumeVPNPending = PendingIntent.getService(this, 0, pauseVPN, 0);
+//            nbuilder.addAction(R.drawable.ic_menu_play,
+//                    getString(R.string.resumevpn), resumeVPNPending);
+//        }
     }
 
     PendingIntent getUserInputIntent(String needed) {
@@ -1235,6 +1237,8 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
                 mConnecttime = System.currentTimeMillis();
                 if (!runningOnAndroidTV())
                     channel = NOTIFICATION_CHANNEL_BG_ID;
+                showNotification(VpnStatus.getLastCleanLogMessage(this),
+                        VpnStatus.getLastCleanLogMessage(this), channel, 0, level, intent);
             } else {
                 mDisplayBytecount = false;
             }
@@ -1244,8 +1248,6 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
             // CONNECTED
             // Does not work :(
             String msg = getString(resid);
-            showNotification(VpnStatus.getLastCleanLogMessage(this),
-                    VpnStatus.getLastCleanLogMessage(this), channel, 0, level, intent);
 
         }
     }
@@ -1272,11 +1274,12 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
     public void updateByteCount(long in, long out, long diffIn, long diffOut) {
         TotalTraffic.calcTraffic(this, in, out, diffIn, diffOut);
         if (mDisplayBytecount) {
-            String netstat = String.format(getString(R.string.statusline_bytecount),
-                    humanReadableByteCount(in, false, getResources()),
-                    humanReadableByteCount(diffIn / OpenVPNManagement.mBytecountInterval, true, getResources()),
-                    humanReadableByteCount(out, false, getResources()),
-                    humanReadableByteCount(diffOut / OpenVPNManagement.mBytecountInterval, true, getResources()));
+            String netstat = "Connected to " + mProfile.mName;
+//                    String.format(getString(R.string.statusline_bytecount),
+//                    humanReadableByteCount(in, false, getResources()),
+//                    humanReadableByteCount(diffIn / OpenVPNManagement.mBytecountInterval, true, getResources()),
+//                    humanReadableByteCount(out, false, getResources()),
+//                    humanReadableByteCount(diffOut / OpenVPNManagement.mBytecountInterval, true, getResources()));
 
 
             showNotification(netstat, null, NOTIFICATION_CHANNEL_BG_ID, mConnecttime, LEVEL_CONNECTED, null);
