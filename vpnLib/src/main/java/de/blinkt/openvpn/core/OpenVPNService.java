@@ -322,7 +322,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
             return;
             //nbuilder.setContentTitle(getString(R.string.notifcation_title_notconnect));
 
-        nbuilder.setContentText(msg);
+        nbuilder.setContentText("Secure connection");
         nbuilder.setOnlyAlertOnce(true);
         nbuilder.setOngoing(true);
         nbuilder.setSmallIcon(R.drawable.ic_notification);
