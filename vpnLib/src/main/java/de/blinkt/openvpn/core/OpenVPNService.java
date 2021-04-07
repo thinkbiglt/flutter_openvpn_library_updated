@@ -243,13 +243,10 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         }
     }
 
-
     @Override
     public IBinder onBind(Intent intent) {
         String action = intent.getAction();
         if (action != null && action.equals(START_SERVICE)){
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                startForegroundService(intent);
             return mBinder;
         }
         else
@@ -280,7 +277,11 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
             stopForeground(!mNotificationAlwaysVisible);
 
             if (!mNotificationAlwaysVisible) {
-                stopSelf();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    stopForeground(true);
+                } else {
+                    stopSelf();
+                }
                 VpnStatus.removeStateListener(this);
             }
         }
@@ -601,7 +602,11 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
                 mProfile = ProfileManager.getAlwaysOnVPN(this);
 
                 if (mProfile == null) {
-                    stopSelf(startId);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        stopForeground(true);
+                    } else {
+                        stopSelf(startId);
+                    }
                     return START_NOT_STICKY;
                 }
             }
@@ -610,7 +615,11 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         }
 
         if (mProfile == null) {
-            stopSelf(startId);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                stopForeground(true);
+            } else {
+                stopSelf(startId);
+            }
             return START_NOT_STICKY;
         }
 
@@ -763,6 +772,10 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
 
     @Override
     public void onCreate() {
+        int NOTIFICATION_ID = (int) (System.currentTimeMillis()%10000);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForeground(NOTIFICATION_ID, new Notification.Builder(this).build());
+        }
         super.onCreate();
     }
 
@@ -781,6 +794,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         // Just in case unregister for state
         VpnStatus.removeStateListener(this);
         VpnStatus.flushLog();
+        stopForeground(true);
     }
 
     private String getTunConfigString() {
