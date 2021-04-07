@@ -247,8 +247,11 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
     @Override
     public IBinder onBind(Intent intent) {
         String action = intent.getAction();
-        if (action != null && action.equals(START_SERVICE))
+        if (action != null && action.equals(START_SERVICE)){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                startForegroundService(intent);
             return mBinder;
+        }
         else
             return super.onBind(intent);
     }
@@ -321,6 +324,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         else
             return;
         //nbuilder.setContentTitle(getString(R.string.notifcation_title_notconnect));
+
 
         Intent launchIntent = this.getPackageManager().getLaunchIntentForPackage(this.getPackageName());
 
