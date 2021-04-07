@@ -41,6 +41,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import java.io.IOException;
@@ -774,7 +775,11 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
     public void onCreate() {
         int NOTIFICATION_ID = (int) (System.currentTimeMillis()%10000);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForeground(NOTIFICATION_ID, new Notification.Builder(this).build());
+            Notification notification = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_NEWSTATUS_ID)
+                    .setContentTitle("")
+                    .setContentText("").build();
+
+            startForeground(NOTIFICATION_ID, notification);
         }
         super.onCreate();
     }
