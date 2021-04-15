@@ -316,12 +316,8 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         else
             priority = PRIORITY_DEFAULT;
 
-        if (mProfile != null)
-            nbuilder.setContentTitle(getString(R.string.notifcation_title, mProfile.mName));
-        else
-            nbuilder.setContentTitle(getString(R.string.notifcation_title_notconnect));
 
-        
+
         String message = msg;
 
         if (message.contains("Reconnecting"))
@@ -337,6 +333,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         else if (message.contains("Connected:"))
             message = "Connected";
 
+        nbuilder.setContentTitle(getString(R.string.notifcation_title, mProfile.mName));
         nbuilder.setContentText(message);
         nbuilder.setOnlyAlertOnce(true);
         nbuilder.setOngoing(true);
