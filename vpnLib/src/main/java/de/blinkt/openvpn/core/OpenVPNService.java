@@ -324,10 +324,10 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         
         String message = msg;
 
-        if (message.contains("Connecting") || message.contains("Building configuration") || message.contains("Waiting"))
-            message = "Connecting";
-        else if (message.contains("Reconnecting"))
+        if (message.contains("Reconnecting"))
             message = "Reconnecting";
+        else if (message.contains("Connecting") || message.contains("Building configuration") || message.contains("Waiting"))
+            message = "Connecting";
         else if (message.contains("Authenticating"))
             message = "Authenticating";
         else if (message.contains("Getting"))
