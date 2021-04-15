@@ -333,7 +333,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         else if (message.contains("Connected:"))
             message = "Connected";
 
-        nbuilder.setContentTitle(getString(R.string.notifcation_title, mProfile.mName));
+        nbuilder.setContentTitle(getString(R.string.notifcation_title, mProfile == null ? "VPN" : mProfile.mName));
         nbuilder.setContentText(message);
         nbuilder.setOnlyAlertOnce(true);
         nbuilder.setOngoing(true);
