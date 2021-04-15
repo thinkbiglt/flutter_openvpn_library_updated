@@ -321,9 +321,23 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         else
             nbuilder.setContentTitle(getString(R.string.notifcation_title_notconnect));
 
+        
+        String message = msg;
 
-        System.out.println("NOTIFICATION MESSAGE IS " + msg);
-        nbuilder.setContentText(msg);
+        if (message.contains("Connecting") || message.contains("Building configuration") || message.contains("Waiting"))
+            message = "Connecting";
+        else if (message.contains("Reconnecting"))
+            message = "Reconnecting";
+        else if (message.contains("Authenticating"))
+            message = "Authenticating";
+        else if (message.contains("Getting"))
+            message = "Getting client configuration";
+        else if (message.contains("Assigning IP"))
+            message = "Assigning IP";
+        else if (message.contains("Connected:"))
+            message = "Connected";
+
+        nbuilder.setContentText(message);
         nbuilder.setOnlyAlertOnce(true);
         nbuilder.setOngoing(true);
         nbuilder.setSmallIcon(R.drawable.ic_notification);
@@ -1269,9 +1283,9 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
 
             showNotification(netstat, null, NOTIFICATION_CHANNEL_BG_ID, mConnecttime, LEVEL_CONNECTED, null);
             byteIn = String.format("↓%2$s", getString(R.string.statusline_bytecount),
-                    humanReadableByteCount(in,false, getResources())) + " - " + humanReadableByteCount(diffIn / OpenVPNManagement.mBytecountInterval, false, getResources()) + "/s";
+                    humanReadableByteCount(in, false, getResources())) + " - " + humanReadableByteCount(diffIn / OpenVPNManagement.mBytecountInterval, false, getResources()) + "/s";
             byteOut = String.format("↑%2$s", getString(R.string.statusline_bytecount),
-                    humanReadableByteCount(out, false,getResources())) + " - " + humanReadableByteCount(diffOut / OpenVPNManagement.mBytecountInterval, false, getResources()) + "/s";
+                    humanReadableByteCount(out, false, getResources())) + " - " + humanReadableByteCount(diffOut / OpenVPNManagement.mBytecountInterval, false, getResources()) + "/s";
             time = Calendar.getInstance().getTimeInMillis() - c;
             lastPacketReceive = Integer.parseInt(convertTwoDigit((int) (time / 1000) % 60)) - Integer.parseInt(seconds);
             seconds = convertTwoDigit((int) (time / 1000) % 60);
@@ -1289,6 +1303,7 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         if (value < 0) return 0;
         else return value;
     }
+
     public String convertTwoDigit(int value) {
         if (value < 10) return "0" + value;
         else return value + "";
@@ -1395,8 +1410,10 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         this.state = state;
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
     }
+
     //sending message to main activity
     public static final String GLOBAL_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
     private void sendMessage(String duration, String lastPacketReceive, String byteIn, String byteOut) {
         Intent intent = new Intent("connectionState");
         intent.putExtra("duration", duration);
@@ -1419,9 +1436,9 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         if (hasExpireDate) {
             Date currentTime = Calendar.getInstance().getTime();
             if (currentTime.after(expireDate)) {
-                try{
+                try {
                     stopVPN(false);
-                }catch (Exception err){
+                } catch (Exception err) {
 
                 }
             }
@@ -1429,12 +1446,14 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
 
         LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
     }
+
     public class LocalBinder extends Binder {
         public OpenVPNService getService() {
             // Return this instance of LocalService so clients can call public methods
             return OpenVPNService.this;
         }
     }
+
     public static String getStatus() {//it will be call from mainactivity for get current status
         return state;
     }
@@ -1444,9 +1463,11 @@ public class OpenVPNService extends VpnService implements StateListener, Callbac
         if (last == null) return null;
         return last.mExpireAt;
     }
+
     public static void setDefaultStatus() {
         state = "";
     }
+
     public boolean isConnected() {
         return flag;
     }
